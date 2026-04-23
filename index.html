@@ -11,19 +11,28 @@
         }
 
         h1 {
-            color: #333;
+            text-align: center;
         }
 
-        ul {
-            padding: 0;
+        table {
+            width: 50%;
+            margin: auto;
+            border-collapse: collapse;
         }
 
-        li {
-            list-style: none;
-            padding: 8px;
-            margin: 5px 0;
-            background: #f2f2f2;
-            border-radius: 5px;
+        th, td {
+            border: 1px solid #333;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
         }
     </style>
 </head>
@@ -31,11 +40,21 @@
 
     <h1>Data Mahasiswa</h1>
 
-    <div id="data"></div>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nama</th>
+            </tr>
+        </thead>
+        <tbody id="data-table">
+            <!-- Data dari JSON akan masuk ke sini -->
+        </tbody>
+    </table>
 
     <script>
         // =========================
-        // DATA (JSON)
+        // DATA JSON
         // =========================
         const mahasiswa = [
             { id: 1, nama: "Andi" },
@@ -44,31 +63,21 @@
         ];
 
         // =========================
-        // FUNCTION (Modular - DRY)
+        // FUNCTION TAMPILKAN DATA
         // =========================
-        function tampilkanData(data) {
-            return data.map(item => 
-                `<li>${item.id} - ${item.nama}</li>`
-            ).join("");
+        function tampilkanTabel(data) {
+            return data.map(item => `
+                <tr>
+                    <td>${item.id}</td>
+                    <td>${item.nama}</td>
+                </tr>
+            `).join("");
         }
 
         // =========================
-        // RENDER
+        // RENDER KE TABLE
         // =========================
-        function render() {
-            const container = document.getElementById("data");
-
-            container.innerHTML = `
-                <ul>
-                    ${tampilkanData(mahasiswa)}
-                </ul>
-            `;
-        }
-
-        // =========================
-        // JALANKAN
-        // =========================
-        render();
+        document.getElementById("data-table").innerHTML = tampilkanTabel(mahasiswa);
     </script>
 
 </body>
