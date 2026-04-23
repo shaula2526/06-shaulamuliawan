@@ -3,17 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <title>Data Mahasiswa</title>
+
     <style>
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
         }
+
         h1 {
             color: #333;
         }
+
         ul {
             padding: 0;
         }
+
         li {
             list-style: none;
             padding: 8px;
@@ -29,6 +33,43 @@
 
     <div id="data"></div>
 
-    <script src="script.js"></script>
+    <script>
+        // =========================
+        // DATA (JSON)
+        // =========================
+        const mahasiswa = [
+            { id: 1, nama: "Andi" },
+            { id: 2, nama: "Budi" },
+            { id: 3, nama: "Citra" }
+        ];
+
+        // =========================
+        // FUNCTION (Modular - DRY)
+        // =========================
+        function tampilkanData(data) {
+            return data.map(item => 
+                `<li>${item.id} - ${item.nama}</li>`
+            ).join("");
+        }
+
+        // =========================
+        // RENDER
+        // =========================
+        function render() {
+            const container = document.getElementById("data");
+
+            container.innerHTML = `
+                <ul>
+                    ${tampilkanData(mahasiswa)}
+                </ul>
+            `;
+        }
+
+        // =========================
+        // JALANKAN
+        // =========================
+        render();
+    </script>
+
 </body>
 </html>
