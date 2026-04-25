@@ -1,84 +1,108 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <title>Data Mahasiswa</title>
+  <meta charset="UTF-8">
+  <title>List & Card DRY</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f5f5f5;
+      padding: 20px;
+    }
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
+    h1 {
+      text-align: center;
+    }
 
-        h1 {
-            text-align: center;
-        }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+    }
 
-        table {
-            width: 50%;
-            margin: auto;
-            border-collapse: collapse;
-        }
+    .card {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      width: 200px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
 
-        th, td {
-            border: 1px solid #333;
-            padding: 10px;
-            text-align: center;
-        }
+    .card h3 {
+      margin: 0;
+      color: #333;
+    }
 
-        th {
-            background-color: #4CAF50;
-            color: white;
-        }
+    .card p {
+      color: #666;
+    }
 
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-    </style>
+    .list {
+      margin-top: 30px;
+    }
+  </style>
 </head>
 <body>
 
-    <h1>Data Mahasiswa</h1>
+<h1>Data User</h1>
 
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nama</th>
-            </tr>
-        </thead>
-        <tbody id="data-table">
-            <!-- Data dari JSON akan masuk ke sini -->
-        </tbody>
-    </table>
+<div id="cardContainer" class="container"></div>
 
-    <script>
-        // =========================
-        // DATA JSON
-        // =========================
-        const mahasiswa = [
-            { id: 1, nama: "Andi" },
-            { id: 2, nama: "Budi" },
-            { id: 3, nama: "Citra" }
-        ];
+<div class="list">
+  <h2>List User</h2>
+  <ul id="listContainer"></ul>
+</div>
 
-        // =========================
-        // FUNCTION TAMPILKAN DATA
-        // =========================
-        function tampilkanTabel(data) {
-            return data.map(item => `
-                <tr>
-                    <td>${item.id}</td>
-                    <td>${item.nama}</td>
-                </tr>
-            `).join("");
-        }
+<script>
+  // =========================
+  // DATA (SCALABLE)
+  // =========================
+  const users = [
+    { id: 1, name: "Shaula", age: 20 },
+    { id: 2, name: "Aji", age: 22 },
+    { id: 3, name: "Citra", age: 19 }
+  ];
 
-        // =========================
-        // RENDER KE TABLE
-        // =========================
-        document.getElementById("data-table").innerHTML = tampilkanTabel(mahasiswa);
-    </script>
+  // =========================
+  // COMPONENT (REUSE)
+  // =========================
+  function createCard(user) {
+    return `
+      <div class="card">
+        <h3>${user.name}</h3>
+        <p>Umur: ${user.age}</p>
+      </div>
+    `;
+  }
+
+  function createListItem(user) {
+    return `<li>${user.name} - ${user.age} tahun</li>`;
+  }
+
+  // =========================
+  // RENDER (MODULAR)
+  // =========================
+  function renderCards(data) {
+    const container = document.getElementById("cardContainer");
+    container.innerHTML = data.map(createCard).join("");
+  }
+
+  function renderList(data) {
+    const list = document.getElementById("listContainer");
+    list.innerHTML = data.map(createListItem).join("");
+  }
+
+  // =========================
+  // INIT (DRY)
+  // =========================
+  function init() {
+    renderCards(users);
+    renderList(users);
+  }
+
+  init();
+</script>
 
 </body>
 </html>
