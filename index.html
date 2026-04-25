@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>List, Card & Form</title>
+  <title>CRUD User - DRY Modular</title>
   <style>
     body {
       font-family: Arial;
@@ -14,12 +14,12 @@
       text-align: center;
     }
 
-    .form-container {
+    .form-container, .search-container {
       background: white;
       padding: 15px;
       border-radius: 10px;
       max-width: 400px;
-      margin: 0 auto 20px;
+      margin: 10px auto;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
 
@@ -30,19 +30,24 @@
     }
 
     button {
-      width: 100%;
-      padding: 10px;
-      background: green;
-      color: white;
+      padding: 8px;
+      margin-top: 5px;
       border: none;
       cursor: pointer;
+      border-radius: 5px;
     }
+
+    .btn-add { background: green; color: white; width: 100%; }
+    .btn-edit { background: orange; color: white; }
+    .btn-delete { background: red; color: white; }
+    .btn-save { background: blue; color: white; width: 100%; }
 
     .container {
       display: flex;
       flex-wrap: wrap;
       gap: 15px;
       justify-content: center;
+      margin-top: 20px;
     }
 
     .card {
@@ -53,21 +58,32 @@
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
 
+    .card button {
+      width: 48%;
+      margin-top: 10px;
+    }
+
     .list {
       margin-top: 30px;
+      text-align: center;
     }
   </style>
 </head>
 <body>
 
-<h1>Data User</h1>
+<h1>CRUD Data User</h1>
 
-<!-- FORM INPUT -->
+<!-- SEARCH -->
+<div class="search-container">
+  <input type="text" id="search" placeholder="Cari nama..." oninput="handleSearch()">
+</div>
+
+<!-- FORM -->
 <div class="form-container">
-  <h3>Tambah User</h3>
+  <h3 id="formTitle">Tambah User</h3>
   <input type="text" id="name" placeholder="Nama">
   <input type="number" id="age" placeholder="Umur">
-  <button onclick="addUser()">Tambah</button>
+  <button class="btn-add" onclick="handleSubmit()">Tambah</button>
 </div>
 
 <!-- CARD -->
@@ -81,12 +97,11 @@
 
 <script>
   // =========================
-  // DATA (SCALABLE)
+  // STATE
   // =========================
-  let users = [
-    { id: 1, name: "Andi", age: 20 },
-    { id: 2, name: "Budi", age: 22 }
-  ];
+  let users = JSON.parse(localStorage.getItem("users")) || [];
+  let editId = null;
+  let filteredUsers = [...users];
 
   // =========================
   // COMPONENT (REUSE)
@@ -96,6 +111,8 @@
       <div class="card">
         <h3>${user.name}</h3>
         <p>Umur: ${user.age}</p>
+        <button class="btn-edit" onclick="editUser(${user.id})">Edit</button>
+        <button class="btn-delete" onclick="deleteUser(${user.id})">Hapus</button>
       </div>
     `;
   }
@@ -105,47 +122,108 @@
   }
 
   // =========================
-  // RENDER (MODULAR)
+  // STORAGE
   // =========================
-  function render() {
-    document.getElementById("cardContainer").innerHTML =
-      users.map(createCard).join("");
-
-    document.getElementById("listContainer").innerHTML =
-      users.map(createListItem).join("");
+  function saveToStorage() {
+    localStorage.setItem("users", JSON.stringify(users));
   }
 
   // =========================
-  // ADD USER (LOGIC)
+  // RENDER
   // =========================
-  function addUser() {
-    const name = document.getElementById("name").value;
-    const age = document.getElementById("age").value;
+  function render() {
+    document.getElementById("cardContainer").innerHTML =
+      filteredUsers.map(createCard).join("");
 
-    if (name === "" || age === "") {
+    document.getElementById("listContainer").innerHTML =
+      filteredUsers.map(createListItem).join("");
+  }
+
+  // =========================
+  // ADD / UPDATE
+  // =========================
+  function handleSubmit() {
+    const name = document.getElementById("name").value.trim();
+    const age = document.getElementById("age").value.trim();
+
+    if (!name || !age) {
       alert("Isi semua field!");
       return;
     }
 
-    const newUser = {
-      id: users.length + 1,
-      name,
-      age
-    };
+    if (editId) {
+      // UPDATE
+      users = users.map(user =>
+        user.id === editId ? { ...user, name, age } : user
+      );
+      editId = null;
+      document.getElementById("formTitle").innerText = "Tambah User";
+      document.querySelector(".btn-add").innerText = "Tambah";
+    } else {
+      // ADD
+      const newUser = {
+        id: Date.now(),
+        name,
+        age
+      };
+      users.push(newUser);
+    }
 
-    users.push(newUser);
+    saveToStorage();
+    resetForm();
+    handleSearch();
+  }
 
-    // reset form
-    document.getElementById("name").value = "";
-    document.getElementById("age").value = "";
+  // =========================
+  // EDIT
+  // =========================
+  function editUser(id) {
+    const user = users.find(u => u.id === id);
+
+    document.getElementById("name").value = user.name;
+    document.getElementById("age").value = user.age;
+
+    editId = id;
+    document.getElementById("formTitle").innerText = "Edit User";
+    document.querySelector(".btn-add").innerText = "Simpan";
+  }
+
+  // =========================
+  // DELETE
+  // =========================
+  function deleteUser(id) {
+    if (confirm("Yakin hapus data?")) {
+      users = users.filter(user => user.id !== id);
+      saveToStorage();
+      handleSearch();
+    }
+  }
+
+  // =========================
+  // SEARCH / FILTER
+  // =========================
+  function handleSearch() {
+    const keyword = document.getElementById("search").value.toLowerCase();
+
+    filteredUsers = users.filter(user =>
+      user.name.toLowerCase().includes(keyword)
+    );
 
     render();
   }
 
   // =========================
+  // UTIL
+  // =========================
+  function resetForm() {
+    document.getElementById("name").value = "";
+    document.getElementById("age").value = "";
+  }
+
+  // =========================
   // INIT
   // =========================
-  render();
+  handleSearch();
 </script>
 
 </body>
