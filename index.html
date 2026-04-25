@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>List, Card & Form</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .form-container {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      max-width: 400px;
+      margin: 0 auto 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: green;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+    }
+
+    .card {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      width: 200px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .list {
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Data User</h1>
+
+<!-- FORM INPUT -->
+<div class="form-container">
+  <h3>Tambah User</h3>
+  <input type="text" id="name" placeholder="Nama">
+  <input type="number" id="age" placeholder="Umur">
+  <button onclick="addUser()">Tambah</button>
+</div>
+
+<!-- CARD -->
+<div id="cardContainer" class="container"></div>
+
+<!-- LIST -->
+<div class="list">
+  <h2>List User</h2>
+  <ul id="listContainer"></ul>
+</div>
+
+<script>
+  // =========================
+  // DATA (SCALABLE)
+  // =========================
+  let users = [
+    { id: 1, name: "Andi", age: 20 },
+    { id: 2, name: "Budi", age: 22 }
+  ];
+
+  // =========================
+  // COMPONENT (REUSE)
+  // =========================
+  function createCard(user) {
+    return `
+      <div class="card">
+        <h3>${user.name}</h3>
+        <p>Umur: ${user.age}</p>
+      </div>
+    `;
+  }
+
+  function createListItem(user) {
+    return `<li>${user.name} - ${user.age} tahun</li>`;
+  }
+
+  // =========================
+  // RENDER (MODULAR)
+  // =========================
+  function render() {
+    document.getElementById("cardContainer").innerHTML =
+      users.map(createCard).join("");
+
+    document.getElementById("listContainer").innerHTML =
+      users.map(createListItem).join("");
+  }
+
+  // =========================
+  // ADD USER (LOGIC)
+  // =========================
+  function addUser() {
+    const name = document.getElementById("name").value;
+    const age = document.getElementById("age").value;
+
+    if (name === "" || age === "") {
+      alert("Isi semua field!");
+      return;
+    }
+
+    const newUser = {
+      id: users.length + 1,
+      name,
+      age
+    };
+
+    users.push(newUser);
+
+    // reset form
+    document.getElementById("name").value = "";
+    document.getElementById("age").value = "";
+
+    render();
+  }
+
+  // =========================
+  // INIT
+  // =========================
+  render();
+</script>
+
+</body>
+</html>
