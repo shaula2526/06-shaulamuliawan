@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>List & Card DRY</title>
+  <title>List, Card & Form</title>
   <style>
     body {
       font-family: Arial;
@@ -12,6 +12,30 @@
 
     h1 {
       text-align: center;
+    }
+
+    .form-container {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      max-width: 400px;
+      margin: 0 auto 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: green;
+      color: white;
+      border: none;
+      cursor: pointer;
     }
 
     .container {
@@ -29,15 +53,6 @@
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
 
-    .card h3 {
-      margin: 0;
-      color: #333;
-    }
-
-    .card p {
-      color: #666;
-    }
-
     .list {
       margin-top: 30px;
     }
@@ -47,8 +62,18 @@
 
 <h1>Data User</h1>
 
+<!-- FORM INPUT -->
+<div class="form-container">
+  <h3>Tambah User</h3>
+  <input type="text" id="name" placeholder="Nama">
+  <input type="number" id="age" placeholder="Umur">
+  <button onclick="addUser()">Tambah</button>
+</div>
+
+<!-- CARD -->
 <div id="cardContainer" class="container"></div>
 
+<!-- LIST -->
 <div class="list">
   <h2>List User</h2>
   <ul id="listContainer"></ul>
@@ -58,10 +83,9 @@
   // =========================
   // DATA (SCALABLE)
   // =========================
-  const users = [
+  let users = [
     { id: 1, name: "Andi", age: 20 },
-    { id: 2, name: "Budi", age: 22 },
-    { id: 3, name: "Citra", age: 19 }
+    { id: 2, name: "Budi", age: 22 }
   ];
 
   // =========================
@@ -83,25 +107,45 @@
   // =========================
   // RENDER (MODULAR)
   // =========================
-  function renderCards(data) {
-    const container = document.getElementById("cardContainer");
-    container.innerHTML = data.map(createCard).join("");
-  }
+  function render() {
+    document.getElementById("cardContainer").innerHTML =
+      users.map(createCard).join("");
 
-  function renderList(data) {
-    const list = document.getElementById("listContainer");
-    list.innerHTML = data.map(createListItem).join("");
+    document.getElementById("listContainer").innerHTML =
+      users.map(createListItem).join("");
   }
 
   // =========================
-  // INIT (DRY)
+  // ADD USER (LOGIC)
   // =========================
-  function init() {
-    renderCards(users);
-    renderList(users);
+  function addUser() {
+    const name = document.getElementById("name").value;
+    const age = document.getElementById("age").value;
+
+    if (name === "" || age === "") {
+      alert("Isi semua field!");
+      return;
+    }
+
+    const newUser = {
+      id: users.length + 1,
+      name,
+      age
+    };
+
+    users.push(newUser);
+
+    // reset form
+    document.getElementById("name").value = "";
+    document.getElementById("age").value = "";
+
+    render();
   }
 
-  init();
+  // =========================
+  // INIT
+  // =========================
+  render();
 </script>
 
 </body>
