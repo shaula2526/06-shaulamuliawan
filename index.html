@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>CRUD Mahasiswa</title>
+  <title>CRUD Mahasiswa Lengkap</title>
 
   <style>
     body {
@@ -11,7 +11,7 @@
       text-align: center;
     }
 
-    input {
+    input, select {
       padding: 10px;
       margin: 5px;
       width: 250px;
@@ -30,7 +30,7 @@
       background: white;
       padding: 20px;
       margin: 20px auto;
-      width: 300px;
+      width: 320px;
       border-radius: 10px;
       box-shadow: 0 3px 8px rgba(0,0,0,0.2);
     }
@@ -43,7 +43,7 @@
 
     .user-card {
       background: white;
-      width: 220px;
+      width: 230px;
       margin: 10px;
       padding: 15px;
       border-radius: 10px;
@@ -64,9 +64,20 @@
 
 <div class="card">
   <h2>Tambah / Edit Mahasiswa</h2>
+
   <input type="text" id="nim" placeholder="NIM">
   <input type="text" id="nama" placeholder="Nama">
   <input type="number" id="umur" placeholder="Umur">
+
+  <!-- 🔥 JURUSAN -->
+  <select id="jurusan">
+    <option value="">Pilih Jurusan</option>
+    <option>Informatika</option>
+    <option>Sistem Informasi</option>
+    <option>Manajemen</option>
+    <option>Akuntansi</option>
+  </select>
+
   <br>
   <button id="submitBtn">Tambah</button>
 </div>
@@ -98,6 +109,7 @@ const clearForm = () => {
   setValue("nim", "");
   setValue("nama", "");
   setValue("umur", "");
+  setValue("jurusan", "");
 };
 
 // ===== VALIDASI =====
@@ -112,6 +124,7 @@ const userCard = (user) => {
       <h3>${user.nama}</h3>
       <p><b>NIM:</b> ${user.nim}</p>
       <p><b>Umur:</b> ${user.umur}</p>
+      <p><b>Jurusan:</b> ${user.jurusan}</p>
 
       <button class="btn-edit" onclick="editUser('${user.id}')">Edit</button>
       <button class="btn-delete" onclick="deleteUser('${user.id}')">Hapus</button>
@@ -136,8 +149,9 @@ const saveUser = () => {
   const nim = getValue("nim");
   const nama = getValue("nama");
   const umur = getValue("umur");
+  const jurusan = getValue("jurusan");
 
-  if (!nim || !nama || !umur) {
+  if (!nim || !nama || !umur || !jurusan) {
     alert("Semua field wajib diisi!");
     return;
   }
@@ -150,7 +164,7 @@ const saveUser = () => {
   if (editId !== null) {
     // UPDATE
     users = users.map(user =>
-      user.id === editId ? { ...user, nim, nama, umur } : user
+      user.id === editId ? { ...user, nim, nama, umur, jurusan } : user
     );
     editId = null;
     submitBtn.innerText = "Tambah";
@@ -160,7 +174,8 @@ const saveUser = () => {
       id: generateId(),
       nim,
       nama,
-      umur
+      umur,
+      jurusan
     });
   }
 
@@ -182,6 +197,7 @@ const editUser = (id) => {
   setValue("nim", user.nim);
   setValue("nama", user.nama);
   setValue("umur", user.umur);
+  setValue("jurusan", user.jurusan);
 
   editId = id;
   submitBtn.innerText = "Update";
