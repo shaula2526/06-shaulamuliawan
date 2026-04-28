@@ -8,251 +8,208 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Inter', sans-serif;
+    :root{
+      --bg:#f8fafc; --card:#ffffff; --text:#0f172a; --muted:#64748b;
+      --primary:#6366f1; --primary-2:#4f46e5;
+      --danger:#ef4444; --warn:#f59e0b; --border:#e2e8f0;
+    }
+    body.dark{
+      --bg:#0b1220; --card:#0f172a; --text:#e5e7eb; --muted:#94a3b8;
+      --primary:#818cf8; --primary-2:#6366f1;
+      --danger:#f87171; --warn:#fbbf24; --border:#1f2937;
     }
 
-    body {
-      background: #f8fafc;
-      color: #1e293b;
+    *{box-sizing:border-box; margin:0; padding:0; font-family:'Inter',sans-serif}
+    body{background:var(--bg); color:var(--text)}
+
+    .container{max-width:1000px; margin:auto; padding:20px}
+    .topbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px}
+    h1{font-size:26px}
+
+    .btn{
+      padding:10px 12px; border-radius:8px; border:none; cursor:pointer;
+      background:var(--primary); color:#fff; font-weight:600; transition:.2s
+    }
+    .btn:hover{background:var(--primary-2)}
+    .btn-ghost{background:transparent; color:var(--text); border:1px solid var(--border)}
+    .btn-warn{background:var(--warn)}
+    .btn-danger{background:var(--danger)}
+
+    .card{
+      background:var(--card); border:1px solid var(--border);
+      border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,.06);
+      padding:16px; margin-bottom:16px
     }
 
-    .container {
-      max-width: 1000px;
-      margin: auto;
-      padding: 20px;
+    input, select{
+      width:100%; padding:12px; border-radius:8px; border:1px solid var(--border);
+      background:transparent; color:var(--text); outline:none
     }
+    input:focus, select:focus{border-color:var(--primary)}
 
-    h1 {
-      font-size: 28px;
-      margin-bottom: 20px;
-    }
+    .grid{display:grid; gap:10px}
+    .list{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px}
 
-    /* FORM */
-    .form-card {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-      margin-bottom: 20px;
-    }
+    .meta{font-size:13px; color:var(--muted)}
+    .actions{display:flex; gap:6px; margin-top:10px}
 
-    .form-grid {
-      display: grid;
-      gap: 10px;
-    }
-
-    input, select {
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid #e2e8f0;
-      outline: none;
-    }
-
-    input:focus, select:focus {
-      border-color: #6366f1;
-    }
-
-    button {
-      padding: 12px;
-      border-radius: 8px;
-      border: none;
-      background: #6366f1;
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    button:hover {
-      background: #4f46e5;
-    }
-
-    /* SEARCH */
-    .search {
-      margin-bottom: 20px;
-    }
-
-    /* LIST */
-    .list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 15px;
-    }
-
-    .card {
-      background: white;
-      padding: 15px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-      transition: 0.2s;
-    }
-
-    .card:hover {
-      transform: translateY(-3px);
-    }
-
-    .card h3 {
-      margin-bottom: 5px;
-    }
-
-    .meta {
-      font-size: 14px;
-      color: #64748b;
-    }
-
-    .actions {
-      margin-top: 10px;
-      display: flex;
-      gap: 5px;
-    }
-
-    .btn-edit {
-      background: #f59e0b;
-    }
-
-    .btn-delete {
-      background: #ef4444;
-    }
-
-    .btn-edit:hover {
-      background: #d97706;
-    }
-
-    .btn-delete:hover {
-      background: #dc2626;
-    }
+    .center{min-height:100vh; display:flex; align-items:center; justify-content:center}
+    .login{width:320px}
   </style>
 </head>
 <body>
 
-<div class="container">
-
-  <h1>📊 Dashboard Mahasiswa</h1>
-
-  <input type="text" id="search" class="search" placeholder="Cari nama / NIM..." />
-
-  <div class="form-card">
-    <h2>Tambah / Edit</h2>
-    <div class="form-grid">
-      <input type="text" id="nim" placeholder="NIM">
-      <input type="text" id="nama" placeholder="Nama">
-      <input type="number" id="umur" placeholder="Umur">
-
-      <select id="jurusan">
-        <option value="">Pilih Jurusan</option>
-        <option>Informatika</option>
-        <option>Sistem Informasi</option>
-        <option>Manajemen</option>
-        <option>Akuntansi</option>
-      </select>
-
-      <button id="submitBtn">Tambah</button>
+<!-- 🔐 LOGIN PAGE -->
+<div id="loginPage" class="center">
+  <div class="card login">
+    <h2 style="margin-bottom:10px">Login Admin</h2>
+    <div class="grid">
+      <input type="text" id="username" placeholder="Username">
+      <input type="password" id="password" placeholder="Password">
+      <button class="btn" onclick="login()">Login</button>
     </div>
   </div>
+</div>
 
-  <div id="userList" class="list"></div>
+<!-- 📊 DASHBOARD -->
+<div id="app" style="display:none">
+  <div class="container">
+    <div class="topbar">
+      <h1>📊 Dashboard Mahasiswa</h1>
+      <div style="display:flex; gap:8px">
+        <button class="btn-ghost btn" onclick="toggleDark()">🌙 Dark</button>
+        <button class="btn-ghost btn" onclick="logout()">Logout</button>
+      </div>
+    </div>
 
+    <input type="text" id="search" placeholder="Cari nama / NIM..." class="card">
+
+    <div class="card">
+      <h3 style="margin-bottom:10px">Tambah / Edit</h3>
+      <div class="grid">
+        <input type="text" id="nim" placeholder="NIM">
+        <input type="text" id="nama" placeholder="Nama">
+        <input type="number" id="umur" placeholder="Umur">
+        <select id="jurusan">
+          <option value="">Pilih Jurusan</option>
+          <option>Informatika</option>
+          <option>Sistem Informasi</option>
+          <option>Manajemen</option>
+          <option>Akuntansi</option>
+        </select>
+        <button id="submitBtn" class="btn">Tambah</button>
+      </div>
+    </div>
+
+    <div id="userList" class="list"></div>
+  </div>
 </div>
 
 <script>
-// ===== DATA =====
-const STORAGE_KEY = "mahasiswa_data";
-let users = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-let editId = null;
+// ===== AUTH (sederhana) =====
+const ADMIN = { user:"admin", pass:"123" };
+const isLogin = () => localStorage.getItem("isLogin")==="true";
 
-// ===== SAVE =====
-const saveToStorage = () => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
+const login = () => {
+  const u = username.value.trim();
+  const p = password.value.trim();
+  if(u===ADMIN.user && p===ADMIN.pass){
+    localStorage.setItem("isLogin","true");
+    initView();
+  }else alert("Login gagal!");
 };
+
+const logout = () => {
+  localStorage.removeItem("isLogin");
+  initView();
+};
+
+// ===== DARK MODE =====
+const applyTheme = () => {
+  const dark = localStorage.getItem("dark")==="true";
+  document.body.classList.toggle("dark", dark);
+};
+const toggleDark = () => {
+  const now = localStorage.getItem("dark")==="true";
+  localStorage.setItem("dark", (!now).toString());
+  applyTheme();
+};
+
+// ===== DATA =====
+const KEY="mahasiswa_data";
+let users = JSON.parse(localStorage.getItem(KEY)) || [];
+let editId=null;
+
+const save=()=>localStorage.setItem(KEY, JSON.stringify(users));
 
 // ===== UTILS =====
-const get = id => document.getElementById(id).value.trim();
-const set = (id, val) => document.getElementById(id).value = val;
-
-const clearForm = () => {
-  set("nim",""); set("nama",""); set("umur",""); set("jurusan","");
-};
-
-// ===== COMPONENT =====
-const card = (u) => `
-  <div class="card">
-    <h3>${u.nama}</h3>
-    <div class="meta">NIM: ${u.nim}</div>
-    <div class="meta">Umur: ${u.umur}</div>
-    <div class="meta">Jurusan: ${u.jurusan}</div>
-
-    <div class="actions">
-      <button class="btn-edit" onclick="editUser('${u.id}')">Edit</button>
-      <button class="btn-delete" onclick="deleteUser('${u.id}')">Hapus</button>
-    </div>
-  </div>
-`;
+const get=id=>document.getElementById(id).value.trim();
+const set=(id,v)=>document.getElementById(id).value=v;
+const clear=()=>["nim","nama","umur","jurusan"].forEach(i=>set(i,""));
 
 // ===== RENDER =====
-const render = (data = users) => {
-  document.getElementById("userList").innerHTML =
-    data.length ? data.map(card).join("") : "<p>Tidak ada data</p>";
+const card=u=>`
+<div class="card">
+  <h3>${u.nama}</h3>
+  <div class="meta">NIM: ${u.nim}</div>
+  <div class="meta">Umur: ${u.umur}</div>
+  <div class="meta">Jurusan: ${u.jurusan}</div>
+  <div class="actions">
+    <button class="btn btn-warn" onclick="editUser('${u.id}')">Edit</button>
+    <button class="btn btn-danger" onclick="deleteUser('${u.id}')">Hapus</button>
+  </div>
+</div>`;
+
+const render=(data=users)=>{
+  userList.innerHTML = data.length ? data.map(card).join("") : "<p>Tidak ada data</p>";
 };
 
 // ===== CRUD =====
-const saveUser = () => {
-  const nim = get("nim");
-  const nama = get("nama");
-  const umur = get("umur");
-  const jurusan = get("jurusan");
+const saveUser=()=>{
+  const nim=get("nim"), nama=get("nama"), umur=get("umur"), jurusan=get("jurusan");
+  if(!nim||!nama||!umur||!jurusan) return alert("Lengkapi semua!");
 
-  if (!nim || !nama || !umur || !jurusan) return alert("Lengkapi semua!");
-
-  if (editId) {
-    users = users.map(u => u.id === editId ? { ...u, nim, nama, umur, jurusan } : u);
-    editId = null;
-    submitBtn.innerText = "Tambah";
-  } else {
-    users.push({
-      id: Date.now().toString(),
-      nim, nama, umur, jurusan
-    });
+  if(editId){
+    users = users.map(u=>u.id===editId?{...u,nim,nama,umur,jurusan}:u);
+    editId=null; submitBtn.innerText="Tambah";
+  }else{
+    users.push({id:Date.now().toString(), nim,nama,umur,jurusan});
   }
-
-  saveToStorage();
-  clearForm();
-  render();
+  save(); clear(); render();
 };
 
-const deleteUser = (id) => {
-  users = users.filter(u => u.id !== id);
-  saveToStorage();
-  render();
+const deleteUser=id=>{
+  users=users.filter(u=>u.id!==id);
+  save(); render();
 };
 
-const editUser = (id) => {
-  const u = users.find(x => x.id === id);
-  set("nim", u.nim);
-  set("nama", u.nama);
-  set("umur", u.umur);
-  set("jurusan", u.jurusan);
-
-  editId = id;
-  submitBtn.innerText = "Update";
+const editUser=id=>{
+  const u=users.find(x=>x.id===id);
+  set("nim",u.nim); set("nama",u.nama); set("umur",u.umur); set("jurusan",u.jurusan);
+  editId=id; submitBtn.innerText="Update";
 };
 
 // ===== SEARCH =====
-document.getElementById("search").addEventListener("input", e => {
-  const k = e.target.value.toLowerCase();
-  render(users.filter(u =>
-    u.nama.toLowerCase().includes(k) ||
-    u.nim.toLowerCase().includes(k)
-  ));
+search?.addEventListener("input",e=>{
+  const k=e.target.value.toLowerCase();
+  render(users.filter(u=>u.nama.toLowerCase().includes(k)||u.nim.toLowerCase().includes(k)));
 });
 
-// ===== INIT =====
-const submitBtn = document.getElementById("submitBtn");
-submitBtn.addEventListener("click", saveUser);
-render();
+// ===== INIT VIEW =====
+const initView=()=>{
+  applyTheme();
+  if(isLogin()){
+    loginPage.style.display="none";
+    app.style.display="block";
+    render();
+  }else{
+    loginPage.style.display="flex";
+    app.style.display="none";
+  }
+};
+
+submitBtn?.addEventListener("click", saveUser);
+initView();
 </script>
 
 </body>
