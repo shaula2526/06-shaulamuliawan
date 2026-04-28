@@ -2,228 +2,183 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>CRUD User - DRY Modular</title>
+  <title>CRUD User Modular</title>
+
   <style>
     body {
       font-family: Arial;
-      background: #f5f5f5;
-      padding: 20px;
-    }
-
-    h1 {
+      background: #f4f4f4;
       text-align: center;
     }
 
-    .form-container, .search-container {
-      background: white;
-      padding: 15px;
-      border-radius: 10px;
-      max-width: 400px;
-      margin: 10px auto;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    h1 {
+      margin-top: 20px;
     }
 
     input {
-      width: 100%;
-      padding: 8px;
-      margin: 5px 0;
+      padding: 10px;
+      margin: 5px;
+      width: 250px;
     }
 
     button {
-      padding: 8px;
-      margin-top: 5px;
+      padding: 10px;
+      background: green;
+      color: white;
       border: none;
       cursor: pointer;
       border-radius: 5px;
     }
 
-    .btn-add { background: green; color: white; width: 100%; }
-    .btn-edit { background: orange; color: white; }
-    .btn-delete { background: red; color: white; }
-    .btn-save { background: blue; color: white; width: 100%; }
-
-    .container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      justify-content: center;
-      margin-top: 20px;
-    }
-
     .card {
       background: white;
+      padding: 20px;
+      margin: 20px auto;
+      width: 300px;
+      border-radius: 10px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    }
+
+    .list-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .user-card {
+      background: white;
+      width: 200px;
+      margin: 10px;
       padding: 15px;
       border-radius: 10px;
-      width: 200px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
 
-    .card button {
-      width: 48%;
-      margin-top: 10px;
+    .btn-edit {
+      background: orange;
+      margin-right: 5px;
     }
 
-    .list {
-      margin-top: 30px;
-      text-align: center;
+    .btn-delete {
+      background: red;
     }
   </style>
+
 </head>
 <body>
 
 <h1>CRUD Data User</h1>
 
-<!-- SEARCH -->
-<div class="search-container">
-  <input type="text" id="search" placeholder="Cari nama..." oninput="handleSearch()">
+<input type="text" id="search" placeholder="Cari nama..." />
+
+<div class="card">
+  <h2>Tambah / Edit User</h2>
+  <input type="text" id="nama" placeholder="Nama">
+  <input type="number" id="umur" placeholder="Umur">
+  <br>
+  <button id="submitBtn">Tambah</button>
 </div>
 
-<!-- FORM -->
-<div class="form-container">
-  <h3 id="formTitle">Tambah User</h3>
-  <input type="text" id="name" placeholder="Nama">
-  <input type="number" id="age" placeholder="Umur">
-  <button class="btn-add" onclick="handleSubmit()">Tambah</button>
-</div>
-
-<!-- CARD -->
-<div id="cardContainer" class="container"></div>
-
-<!-- LIST -->
-<div class="list">
-  <h2>List User</h2>
-  <ul id="listContainer"></ul>
-</div>
+<h2>List User</h2>
+<div id="userList" class="list-container"></div>
 
 <script>
-  // =========================
-  // STATE
-  // =========================
-  let users = JSON.parse(localStorage.getItem("users")) || [];
-  let editId = null;
-  let filteredUsers = [...users];
+// ===== DATA =====
+let users = [];
+let editIndex = null;
 
-  // =========================
-  // COMPONENT (REUSE)
-  // =========================
-  function createCard(user) {
-    return `
-      <div class="card">
-        <h3>${user.name}</h3>
-        <p>Umur: ${user.age}</p>
-        <button class="btn-edit" onclick="editUser(${user.id})">Edit</button>
-        <button class="btn-delete" onclick="deleteUser(${user.id})">Hapus</button>
-      </div>
-    `;
+// ===== UTILS =====
+const getValue = (id) => document.getElementById(id).value;
+const setValue = (id, val) => document.getElementById(id).value = val;
+
+const clearForm = () => {
+  setValue("nama", "");
+  setValue("umur", "");
+};
+
+// ===== COMPONENT =====
+const userCard = (user, index) => {
+  return `
+    <div class="user-card">
+      <h3>${user.nama}</h3>
+      <p>Umur: ${user.umur}</p>
+
+      <button class="btn-edit" onclick="editUser(${index})">Edit</button>
+      <button class="btn-delete" onclick="deleteUser(${index})">Hapus</button>
+    </div>
+  `;
+};
+
+// ===== RENDER =====
+const render = (data = users) => {
+  const container = document.getElementById("userList");
+
+  if (data.length === 0) {
+    container.innerHTML = "<p>Tidak ada data</p>";
+    return;
   }
 
-  function createListItem(user) {
-    return `<li>${user.name} - ${user.age} tahun</li>`;
+  container.innerHTML = data.map(userCard).join("");
+};
+
+// ===== CRUD =====
+const saveUser = () => {
+  const nama = getValue("nama");
+  const umur = getValue("umur");
+
+  if (!nama || !umur) {
+    alert("Isi semua field!");
+    return;
   }
 
-  // =========================
-  // STORAGE
-  // =========================
-  function saveToStorage() {
-    localStorage.setItem("users", JSON.stringify(users));
+  if (editIndex !== null) {
+    // UPDATE
+    users[editIndex] = { nama, umur };
+    editIndex = null;
+    submitBtn.innerText = "Tambah";
+  } else {
+    // CREATE
+    users.push({ nama, umur });
   }
 
-  // =========================
-  // RENDER
-  // =========================
-  function render() {
-    document.getElementById("cardContainer").innerHTML =
-      filteredUsers.map(createCard).join("");
+  clearForm();
+  render();
+};
 
-    document.getElementById("listContainer").innerHTML =
-      filteredUsers.map(createListItem).join("");
-  }
+const deleteUser = (index) => {
+  users.splice(index, 1);
+  render();
+};
 
-  // =========================
-  // ADD / UPDATE
-  // =========================
-  function handleSubmit() {
-    const name = document.getElementById("name").value.trim();
-    const age = document.getElementById("age").value.trim();
+// ===== EDIT =====
+const editUser = (index) => {
+  const user = users[index];
 
-    if (!name || !age) {
-      alert("Isi semua field!");
-      return;
-    }
+  setValue("nama", user.nama);
+  setValue("umur", user.umur);
 
-    if (editId) {
-      // UPDATE
-      users = users.map(user =>
-        user.id === editId ? { ...user, name, age } : user
-      );
-      editId = null;
-      document.getElementById("formTitle").innerText = "Tambah User";
-      document.querySelector(".btn-add").innerText = "Tambah";
-    } else {
-      // ADD
-      const newUser = {
-        id: Date.now(),
-        name,
-        age
-      };
-      users.push(newUser);
-    }
+  editIndex = index;
+  submitBtn.innerText = "Update";
+};
 
-    saveToStorage();
-    resetForm();
-    handleSearch();
-  }
+// ===== SEARCH =====
+document.getElementById("search").addEventListener("input", (e) => {
+  const keyword = e.target.value.toLowerCase();
 
-  // =========================
-  // EDIT
-  // =========================
-  function editUser(id) {
-    const user = users.find(u => u.id === id);
+  const filtered = users.filter(u =>
+    u.nama.toLowerCase().includes(keyword)
+  );
 
-    document.getElementById("name").value = user.name;
-    document.getElementById("age").value = user.age;
+  render(filtered);
+});
 
-    editId = id;
-    document.getElementById("formTitle").innerText = "Edit User";
-    document.querySelector(".btn-add").innerText = "Simpan";
-  }
+// ===== EVENT =====
+const submitBtn = document.getElementById("submitBtn");
+submitBtn.addEventListener("click", saveUser);
 
-  // =========================
-  // DELETE
-  // =========================
-  function deleteUser(id) {
-    if (confirm("Yakin hapus data?")) {
-      users = users.filter(user => user.id !== id);
-      saveToStorage();
-      handleSearch();
-    }
-  }
+// ===== INIT =====
+render();
 
-  // =========================
-  // SEARCH / FILTER
-  // =========================
-  function handleSearch() {
-    const keyword = document.getElementById("search").value.toLowerCase();
-
-    filteredUsers = users.filter(user =>
-      user.name.toLowerCase().includes(keyword)
-    );
-
-    render();
-  }
-
-  // =========================
-  // UTIL
-  // =========================
-  function resetForm() {
-    document.getElementById("name").value = "";
-    document.getElementById("age").value = "";
-  }
-
-  // =========================
-  // INIT
-  // =========================
-  handleSearch();
 </script>
 
 </body>
