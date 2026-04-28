@@ -2,99 +2,167 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>CRUD Mahasiswa Lengkap</title>
+  <title>Dashboard Mahasiswa</title>
+
+  <!-- FONT -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
     body {
-      font-family: Arial;
-      background: #f4f4f4;
-      text-align: center;
+      background: #f8fafc;
+      color: #1e293b;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+
+    /* FORM */
+    .form-card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 10px;
     }
 
     input, select {
-      padding: 10px;
-      margin: 5px;
-      width: 250px;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: #6366f1;
     }
 
     button {
-      padding: 10px;
-      background: green;
-      color: white;
+      padding: 12px;
+      border-radius: 8px;
       border: none;
+      background: #6366f1;
+      color: white;
+      font-weight: 600;
       cursor: pointer;
-      border-radius: 5px;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: #4f46e5;
+    }
+
+    /* SEARCH */
+    .search {
+      margin-bottom: 20px;
+    }
+
+    /* LIST */
+    .list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 15px;
     }
 
     .card {
       background: white;
-      padding: 20px;
-      margin: 20px auto;
-      width: 320px;
-      border-radius: 10px;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-    }
-
-    .list-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .user-card {
-      background: white;
-      width: 230px;
-      margin: 10px;
       padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      text-align: left;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      transition: 0.2s;
     }
 
-    .btn-edit { background: orange; }
-    .btn-delete { background: red; }
-  </style>
+    .card:hover {
+      transform: translateY(-3px);
+    }
 
+    .card h3 {
+      margin-bottom: 5px;
+    }
+
+    .meta {
+      font-size: 14px;
+      color: #64748b;
+    }
+
+    .actions {
+      margin-top: 10px;
+      display: flex;
+      gap: 5px;
+    }
+
+    .btn-edit {
+      background: #f59e0b;
+    }
+
+    .btn-delete {
+      background: #ef4444;
+    }
+
+    .btn-edit:hover {
+      background: #d97706;
+    }
+
+    .btn-delete:hover {
+      background: #dc2626;
+    }
+  </style>
 </head>
 <body>
 
-<h1>CRUD Data Mahasiswa</h1>
+<div class="container">
 
-<input type="text" id="search" placeholder="Cari nama / NIM..." />
+  <h1>📊 Dashboard Mahasiswa</h1>
 
-<div class="card">
-  <h2>Tambah / Edit Mahasiswa</h2>
+  <input type="text" id="search" class="search" placeholder="Cari nama / NIM..." />
 
-  <input type="text" id="nim" placeholder="NIM">
-  <input type="text" id="nama" placeholder="Nama">
-  <input type="number" id="umur" placeholder="Umur">
+  <div class="form-card">
+    <h2>Tambah / Edit</h2>
+    <div class="form-grid">
+      <input type="text" id="nim" placeholder="NIM">
+      <input type="text" id="nama" placeholder="Nama">
+      <input type="number" id="umur" placeholder="Umur">
 
-  <!-- 🔥 JURUSAN -->
-  <select id="jurusan">
-    <option value="">Pilih Jurusan</option>
-    <option>Informatika</option>
-    <option>Sistem Informasi</option>
-    <option>Manajemen</option>
-    <option>Akuntansi</option>
-  </select>
+      <select id="jurusan">
+        <option value="">Pilih Jurusan</option>
+        <option>Informatika</option>
+        <option>Sistem Informasi</option>
+        <option>Manajemen</option>
+        <option>Akuntansi</option>
+      </select>
 
-  <br>
-  <button id="submitBtn">Tambah</button>
+      <button id="submitBtn">Tambah</button>
+    </div>
+  </div>
+
+  <div id="userList" class="list"></div>
+
 </div>
 
-<h2>List Mahasiswa</h2>
-<div id="userList" class="list-container"></div>
-
 <script>
-// ===== STORAGE =====
-const STORAGE_KEY = "mahasiswa_data";
-
 // ===== DATA =====
+const STORAGE_KEY = "mahasiswa_data";
 let users = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 let editId = null;
-
-// ===== GENERATE ID =====
-const generateId = () => Date.now().toString();
 
 // ===== SAVE =====
 const saveToStorage = () => {
@@ -102,80 +170,51 @@ const saveToStorage = () => {
 };
 
 // ===== UTILS =====
-const getValue = (id) => document.getElementById(id).value.trim();
-const setValue = (id, val) => document.getElementById(id).value = val;
+const get = id => document.getElementById(id).value.trim();
+const set = (id, val) => document.getElementById(id).value = val;
 
 const clearForm = () => {
-  setValue("nim", "");
-  setValue("nama", "");
-  setValue("umur", "");
-  setValue("jurusan", "");
-};
-
-// ===== VALIDASI =====
-const isNimExist = (nim) => {
-  return users.some(u => u.nim === nim && u.id !== editId);
+  set("nim",""); set("nama",""); set("umur",""); set("jurusan","");
 };
 
 // ===== COMPONENT =====
-const userCard = (user) => {
-  return `
-    <div class="user-card">
-      <h3>${user.nama}</h3>
-      <p><b>NIM:</b> ${user.nim}</p>
-      <p><b>Umur:</b> ${user.umur}</p>
-      <p><b>Jurusan:</b> ${user.jurusan}</p>
+const card = (u) => `
+  <div class="card">
+    <h3>${u.nama}</h3>
+    <div class="meta">NIM: ${u.nim}</div>
+    <div class="meta">Umur: ${u.umur}</div>
+    <div class="meta">Jurusan: ${u.jurusan}</div>
 
-      <button class="btn-edit" onclick="editUser('${user.id}')">Edit</button>
-      <button class="btn-delete" onclick="deleteUser('${user.id}')">Hapus</button>
+    <div class="actions">
+      <button class="btn-edit" onclick="editUser('${u.id}')">Edit</button>
+      <button class="btn-delete" onclick="deleteUser('${u.id}')">Hapus</button>
     </div>
-  `;
-};
+  </div>
+`;
 
 // ===== RENDER =====
 const render = (data = users) => {
-  const container = document.getElementById("userList");
-
-  if (data.length === 0) {
-    container.innerHTML = "<p>Tidak ada data</p>";
-    return;
-  }
-
-  container.innerHTML = data.map(userCard).join("");
+  document.getElementById("userList").innerHTML =
+    data.length ? data.map(card).join("") : "<p>Tidak ada data</p>";
 };
 
 // ===== CRUD =====
 const saveUser = () => {
-  const nim = getValue("nim");
-  const nama = getValue("nama");
-  const umur = getValue("umur");
-  const jurusan = getValue("jurusan");
+  const nim = get("nim");
+  const nama = get("nama");
+  const umur = get("umur");
+  const jurusan = get("jurusan");
 
-  if (!nim || !nama || !umur || !jurusan) {
-    alert("Semua field wajib diisi!");
-    return;
-  }
+  if (!nim || !nama || !umur || !jurusan) return alert("Lengkapi semua!");
 
-  if (isNimExist(nim)) {
-    alert("NIM sudah digunakan!");
-    return;
-  }
-
-  if (editId !== null) {
-    // UPDATE
-    users = users.map(user =>
-      user.id === editId ? { ...user, nim, nama, umur, jurusan } : user
-    );
+  if (editId) {
+    users = users.map(u => u.id === editId ? { ...u, nim, nama, umur, jurusan } : u);
     editId = null;
     submitBtn.innerText = "Tambah";
   } else {
-    // CREATE
     users.push({
-      id: generateId(),
-      nim,
-      nama,
-      umur,
-      jurusan
+      id: Date.now().toString(),
+      nim, nama, umur, jurusan
     });
   }
 
@@ -185,43 +224,35 @@ const saveUser = () => {
 };
 
 const deleteUser = (id) => {
-  users = users.filter(user => user.id !== id);
+  users = users.filter(u => u.id !== id);
   saveToStorage();
   render();
 };
 
-// ===== EDIT =====
 const editUser = (id) => {
-  const user = users.find(u => u.id === id);
-
-  setValue("nim", user.nim);
-  setValue("nama", user.nama);
-  setValue("umur", user.umur);
-  setValue("jurusan", user.jurusan);
+  const u = users.find(x => x.id === id);
+  set("nim", u.nim);
+  set("nama", u.nama);
+  set("umur", u.umur);
+  set("jurusan", u.jurusan);
 
   editId = id;
   submitBtn.innerText = "Update";
 };
 
 // ===== SEARCH =====
-document.getElementById("search").addEventListener("input", (e) => {
-  const keyword = e.target.value.toLowerCase();
-
-  const filtered = users.filter(u =>
-    u.nama.toLowerCase().includes(keyword) ||
-    u.nim.toLowerCase().includes(keyword)
-  );
-
-  render(filtered);
+document.getElementById("search").addEventListener("input", e => {
+  const k = e.target.value.toLowerCase();
+  render(users.filter(u =>
+    u.nama.toLowerCase().includes(k) ||
+    u.nim.toLowerCase().includes(k)
+  ));
 });
 
-// ===== EVENT =====
+// ===== INIT =====
 const submitBtn = document.getElementById("submitBtn");
 submitBtn.addEventListener("click", saveUser);
-
-// ===== INIT =====
 render();
-
 </script>
 
 </body>
