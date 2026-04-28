@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>CRUD User + Unique ID</title>
+  <title>CRUD Mahasiswa</title>
 
   <style>
     body {
@@ -43,11 +43,12 @@
 
     .user-card {
       background: white;
-      width: 200px;
+      width: 220px;
       margin: 10px;
       padding: 15px;
       border-radius: 10px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      text-align: left;
     }
 
     .btn-edit { background: orange; }
@@ -57,24 +58,25 @@
 </head>
 <body>
 
-<h1>CRUD Data User</h1>
+<h1>CRUD Data Mahasiswa</h1>
 
-<input type="text" id="search" placeholder="Cari nama..." />
+<input type="text" id="search" placeholder="Cari nama / NIM..." />
 
 <div class="card">
-  <h2>Tambah / Edit User</h2>
+  <h2>Tambah / Edit Mahasiswa</h2>
+  <input type="text" id="nim" placeholder="NIM">
   <input type="text" id="nama" placeholder="Nama">
   <input type="number" id="umur" placeholder="Umur">
   <br>
   <button id="submitBtn">Tambah</button>
 </div>
 
-<h2>List User</h2>
+<h2>List Mahasiswa</h2>
 <div id="userList" class="list-container"></div>
 
 <script>
 // ===== STORAGE =====
-const STORAGE_KEY = "users_data";
+const STORAGE_KEY = "mahasiswa_data";
 
 // ===== DATA =====
 let users = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
@@ -89,12 +91,18 @@ const saveToStorage = () => {
 };
 
 // ===== UTILS =====
-const getValue = (id) => document.getElementById(id).value;
+const getValue = (id) => document.getElementById(id).value.trim();
 const setValue = (id, val) => document.getElementById(id).value = val;
 
 const clearForm = () => {
+  setValue("nim", "");
   setValue("nama", "");
   setValue("umur", "");
+};
+
+// ===== VALIDASI =====
+const isNimExist = (nim) => {
+  return users.some(u => u.nim === nim && u.id !== editId);
 };
 
 // ===== COMPONENT =====
@@ -102,7 +110,8 @@ const userCard = (user) => {
   return `
     <div class="user-card">
       <h3>${user.nama}</h3>
-      <p>Umur: ${user.umur}</p>
+      <p><b>NIM:</b> ${user.nim}</p>
+      <p><b>Umur:</b> ${user.umur}</p>
 
       <button class="btn-edit" onclick="editUser('${user.id}')">Edit</button>
       <button class="btn-delete" onclick="deleteUser('${user.id}')">Hapus</button>
@@ -124,18 +133,24 @@ const render = (data = users) => {
 
 // ===== CRUD =====
 const saveUser = () => {
+  const nim = getValue("nim");
   const nama = getValue("nama");
   const umur = getValue("umur");
 
-  if (!nama || !umur) {
-    alert("Isi semua field!");
+  if (!nim || !nama || !umur) {
+    alert("Semua field wajib diisi!");
+    return;
+  }
+
+  if (isNimExist(nim)) {
+    alert("NIM sudah digunakan!");
     return;
   }
 
   if (editId !== null) {
     // UPDATE
     users = users.map(user =>
-      user.id === editId ? { ...user, nama, umur } : user
+      user.id === editId ? { ...user, nim, nama, umur } : user
     );
     editId = null;
     submitBtn.innerText = "Tambah";
@@ -143,6 +158,7 @@ const saveUser = () => {
     // CREATE
     users.push({
       id: generateId(),
+      nim,
       nama,
       umur
     });
@@ -163,6 +179,7 @@ const deleteUser = (id) => {
 const editUser = (id) => {
   const user = users.find(u => u.id === id);
 
+  setValue("nim", user.nim);
   setValue("nama", user.nama);
   setValue("umur", user.umur);
 
@@ -175,7 +192,8 @@ document.getElementById("search").addEventListener("input", (e) => {
   const keyword = e.target.value.toLowerCase();
 
   const filtered = users.filter(u =>
-    u.nama.toLowerCase().includes(keyword)
+    u.nama.toLowerCase().includes(keyword) ||
+    u.nim.toLowerCase().includes(keyword)
   );
 
   render(filtered);
