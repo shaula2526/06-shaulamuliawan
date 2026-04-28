@@ -2,17 +2,13 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>CRUD User Modular</title>
+  <title>CRUD User + LocalStorage</title>
 
   <style>
     body {
       font-family: Arial;
       background: #f4f4f4;
       text-align: center;
-    }
-
-    h1 {
-      margin-top: 20px;
     }
 
     input {
@@ -54,14 +50,8 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
 
-    .btn-edit {
-      background: orange;
-      margin-right: 5px;
-    }
-
-    .btn-delete {
-      background: red;
-    }
+    .btn-edit { background: orange; }
+    .btn-delete { background: red; }
   </style>
 
 </head>
@@ -83,9 +73,17 @@
 <div id="userList" class="list-container"></div>
 
 <script>
-// ===== DATA =====
-let users = [];
+// ===== STORAGE KEY =====
+const STORAGE_KEY = "users_data";
+
+// ===== LOAD DATA =====
+let users = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 let editIndex = null;
+
+// ===== SAVE DATA =====
+const saveToStorage = () => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
+};
 
 // ===== UTILS =====
 const getValue = (id) => document.getElementById(id).value;
@@ -132,21 +130,21 @@ const saveUser = () => {
   }
 
   if (editIndex !== null) {
-    // UPDATE
     users[editIndex] = { nama, umur };
     editIndex = null;
     submitBtn.innerText = "Tambah";
   } else {
-    // CREATE
     users.push({ nama, umur });
   }
 
+  saveToStorage(); // 🔥 simpan
   clearForm();
   render();
 };
 
 const deleteUser = (index) => {
   users.splice(index, 1);
+  saveToStorage(); // 🔥 simpan
   render();
 };
 
