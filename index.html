@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>CRUD User + LocalStorage</title>
+  <title>CRUD User + Unique ID</title>
 
   <style>
     body {
@@ -73,14 +73,17 @@
 <div id="userList" class="list-container"></div>
 
 <script>
-// ===== STORAGE KEY =====
+// ===== STORAGE =====
 const STORAGE_KEY = "users_data";
 
-// ===== LOAD DATA =====
+// ===== DATA =====
 let users = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-let editIndex = null;
+let editId = null;
 
-// ===== SAVE DATA =====
+// ===== GENERATE ID =====
+const generateId = () => Date.now().toString();
+
+// ===== SAVE =====
 const saveToStorage = () => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
 };
@@ -95,14 +98,14 @@ const clearForm = () => {
 };
 
 // ===== COMPONENT =====
-const userCard = (user, index) => {
+const userCard = (user) => {
   return `
     <div class="user-card">
       <h3>${user.nama}</h3>
       <p>Umur: ${user.umur}</p>
 
-      <button class="btn-edit" onclick="editUser(${index})">Edit</button>
-      <button class="btn-delete" onclick="deleteUser(${index})">Hapus</button>
+      <button class="btn-edit" onclick="editUser('${user.id}')">Edit</button>
+      <button class="btn-delete" onclick="deleteUser('${user.id}')">Hapus</button>
     </div>
   `;
 };
@@ -129,33 +132,41 @@ const saveUser = () => {
     return;
   }
 
-  if (editIndex !== null) {
-    users[editIndex] = { nama, umur };
-    editIndex = null;
+  if (editId !== null) {
+    // UPDATE
+    users = users.map(user =>
+      user.id === editId ? { ...user, nama, umur } : user
+    );
+    editId = null;
     submitBtn.innerText = "Tambah";
   } else {
-    users.push({ nama, umur });
+    // CREATE
+    users.push({
+      id: generateId(),
+      nama,
+      umur
+    });
   }
 
-  saveToStorage(); // 🔥 simpan
+  saveToStorage();
   clearForm();
   render();
 };
 
-const deleteUser = (index) => {
-  users.splice(index, 1);
-  saveToStorage(); // 🔥 simpan
+const deleteUser = (id) => {
+  users = users.filter(user => user.id !== id);
+  saveToStorage();
   render();
 };
 
 // ===== EDIT =====
-const editUser = (index) => {
-  const user = users[index];
+const editUser = (id) => {
+  const user = users.find(u => u.id === id);
 
   setValue("nama", user.nama);
   setValue("umur", user.umur);
 
-  editIndex = index;
+  editId = id;
   submitBtn.innerText = "Update";
 };
 
